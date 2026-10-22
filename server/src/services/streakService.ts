@@ -44,6 +44,15 @@ export function calculateStreak(streak: StreakInfo, today: string): StreakInfo {
   };
 }
 
+/**
+ * The streak as of `today`. The stored value only changes on activity, so after a missed day it
+ * still holds the old count until the next lesson resets it; for display it is already 0.
+ */
+export function getEffectiveStreak(streak: StreakInfo, today: string): number {
+  const last = streak.lastActivityDate;
+  return last && last >= previousDateKey(today) ? streak.currentStreak : 0;
+}
+
 export function toStreakInfo(user: {
   currentStreak: number;
   longestStreak: number;

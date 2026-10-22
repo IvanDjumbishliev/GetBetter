@@ -6,6 +6,7 @@ import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { authRouter } from './modules/auth/authRouter';
 import { lessonsRouter, topicsRouter } from './modules/lessons/lessonsRouter';
+import { meRouter } from './modules/progress/progressRouter';
 import { quizRouter } from './modules/quiz/quizRouter';
 import { healthRouter } from './routes/health';
 
@@ -20,6 +21,7 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/topics`, topicsRouter);
 app.use(`${API_PREFIX}/lessons`, lessonsRouter);
 app.use(`${API_PREFIX}/quiz-attempts`, quizRouter);
+app.use(`${API_PREFIX}/me`, meRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

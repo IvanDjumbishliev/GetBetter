@@ -65,3 +65,12 @@ export const quizAttemptsQuerySchema = z.object({
 });
 
 export type CreateQuizAttemptInput = z.infer<typeof createQuizAttemptSchema>;
+
+export const STATS_DEFAULT_DAYS = 30;
+export const STATS_MAX_DAYS = 366;
+
+export const statsQuerySchema = z.object({
+  timeZone: timeZoneSchema,
+  /** How many days of activity to return, ending today. */
+  days: z.coerce.number().int().min(1).max(STATS_MAX_DAYS).default(STATS_DEFAULT_DAYS),
+});

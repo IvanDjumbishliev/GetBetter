@@ -46,6 +46,12 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        heat: {
+          0: 'hsl(var(--heat-0))',
+          1: 'hsl(var(--heat-1))',
+          2: 'hsl(var(--heat-2))',
+          3: 'hsl(var(--heat-3))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

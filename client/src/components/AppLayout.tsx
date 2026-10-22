@@ -20,12 +20,12 @@ export function AppLayout() {
     <div className="min-h-screen">
       <header className="border-b">
         <div className="container flex h-14 items-center gap-6">
-          <Link to="/" className="font-bold tracking-tight">
+          <Link to="/dashboard" className="font-bold tracking-tight">
             {APP_NAME}
           </Link>
           <nav className="flex items-center gap-4">
-            <NavLink to="/" end className={navLinkClass}>
-              Home
+            <NavLink to="/dashboard" className={navLinkClass}>
+              Dashboard
             </NavLink>
             <NavLink to="/topics" className={navLinkClass}>
               Topics

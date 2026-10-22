@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { calculateStreak, previousDateKey, toDateKey } from '../src/services/streakService';
+import {
+  calculateStreak,
+  getEffectiveStreak,
+  previousDateKey,
+  toDateKey,
+} from '../src/services/streakService';
 
 const streak = (currentStreak: number, longestStreak: number, lastActivityDate: string | null) => ({
   currentStreak,
@@ -52,5 +57,17 @@ describe('date keys', () => {
   it('computes the previous day', () => {
     expect(previousDateKey('2026-03-01')).toBe('2026-02-28');
     expect(previousDateKey('2026-01-01')).toBe('2025-12-31');
+  });
+});
+
+describe('getEffectiveStreak', () => {
+  it('keeps the streak when the last activity was today or yesterday', () => {
+    expect(getEffectiveStreak(streak(5, 5, '2026-10-22'), '2026-10-22')).toBe(5);
+    expect(getEffectiveStreak(streak(5, 5, '2026-10-21'), '2026-10-22')).toBe(5);
+  });
+
+  it('is 0 once a day has been missed or with no activity', () => {
+    expect(getEffectiveStreak(streak(5, 5, '2026-10-20'), '2026-10-22')).toBe(0);
+    expect(getEffectiveStreak(streak(0, 0, null), '2026-10-22')).toBe(0);
   });
 });

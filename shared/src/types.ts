@@ -174,3 +174,30 @@ export interface QuizAttempt extends QuizAttemptResult {
 export interface QuizAttemptsResponse {
   attempts: QuizAttempt[];
 }
+
+export interface DailyActivity {
+  /** Calendar date (YYYY-MM-DD) in the requested time zone. */
+  date: string;
+  lessonsCompleted: number;
+}
+
+export interface CategoryProgress {
+  categoryName: string;
+  categorySlug: string;
+  lessonsCompleted: number;
+  totalLessons: number;
+}
+
+export interface UserStats {
+  /** 0 if the streak has lapsed (no activity today or yesterday), even before the next lesson resets it. */
+  currentStreak: number;
+  longestStreak: number;
+  totalLessonsCompleted: number;
+  totalTopicsEnrolled: number;
+  totalQuizzesTaken: number;
+  /** Mean of all quiz attempt scores, 0–1 (0 when no quizzes have been taken). */
+  averageQuizScore: number;
+  /** One entry per day, oldest first, ending today; days without activity are included as 0. */
+  weeklyActivity: DailyActivity[];
+  categoryBreakdown: CategoryProgress[];
+}

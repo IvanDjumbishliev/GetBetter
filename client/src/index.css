@@ -24,6 +24,11 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
+    /* Activity heatmap: one-hue ordinal ramp (0, 1, 2, 3+ lessons), validated for >= 2:1 at step 1. */
+    --heat-0: 0 0% 94%;
+    --heat-1: 0 0% 64%;
+    --heat-2: 0 0% 32%;
+    --heat-3: 0 0% 9%;
   }
 
   .dark {
@@ -46,6 +51,10 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+    --heat-0: 0 0% 12%;
+    --heat-1: 0 0% 32%;
+    --heat-2: 0 0% 64%;
+    --heat-3: 0 0% 90%;
   }
 }
 
