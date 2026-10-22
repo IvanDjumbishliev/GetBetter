@@ -1,0 +1,184 @@
+// Prisma schema for GetBetter.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  displayName      String
+  avatarUrl        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastActivityDate DateTime? @db.Date
+
+  enrollments    Enrollment[]
+  progresses     LessonProgress[]
+  quizAttempts   QuizAttempt[]
+  communityPosts CommunityPost[]
+  comments       Comment[]
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  iconUrl     String?
+
+  topics Topic[]
+}
+
+model Topic {
+  id               String     @id @default(cuid())
+  title            String
+  slug             String     @unique
+  description      String?
+  difficulty       Difficulty @default(BEGINNER)
+  categoryId       String
+  estimatedMinutes Int
+
+  category       Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  lessons        Lesson[]
+  enrollments    Enrollment[]
+  communityPosts CommunityPost[]
+
+  @@index([categoryId])
+  @@index([difficulty])
+}
+
+model Lesson {
+  id      String  @id @default(cuid())
+  topicId String
+  order   Int
+  title   String
+  content String  @db.Text
+  summary String?
+
+  topic         Topic            @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  flashcards    Flashcard[]
+  quizQuestions QuizQuestion[]
+  progresses    LessonProgress[]
+  quizAttempts  QuizAttempt[]
+
+  // Also serves as the index for "lessons of a topic, in order".
+  @@unique([topicId, order])
+}
+
+model Flashcard {
+  id       String @id @default(cuid())
+  lessonId String
+  front    String @db.Text
+  back     String @db.Text
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model QuizQuestion {
+  id              String @id @default(cuid())
+  lessonId        String
+  question        String @db.Text
+  /// Array of { id: string, text: string }
+  options         Json
+  correctOptionId String
+  explanation     String @db.Text
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  topicId     String
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  // The unique index leads with userId, so it covers per-user lookups too.
+  @@unique([userId, topicId])
+  @@index([topicId])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([lessonId])
+  @@index([userId, completedAt])
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  score       Float
+  attemptedAt DateTime @default(now())
+  /// Array of { questionId: string, selectedOptionId: string }
+  answers     Json
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, attemptedAt])
+  @@index([lessonId])
+}
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  userId    String
+  topicId   String?
+  title     String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic    Topic?    @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  comments Comment[]
+
+  @@index([userId])
+  @@index([topicId, createdAt])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([userId])
+}
