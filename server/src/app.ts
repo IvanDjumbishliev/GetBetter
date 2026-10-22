@@ -5,6 +5,7 @@ import express from 'express';
 import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { authRouter } from './modules/auth/authRouter';
+import { lessonsRouter, topicsRouter } from './modules/lessons/lessonsRouter';
 import { healthRouter } from './routes/health';
 
 export const app = express();
@@ -15,6 +16,8 @@ app.use(cookieParser());
 
 app.use(`${API_PREFIX}/health`, healthRouter);
 app.use(`${API_PREFIX}/auth`, authRouter);
+app.use(`${API_PREFIX}/topics`, topicsRouter);
+app.use(`${API_PREFIX}/lessons`, lessonsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

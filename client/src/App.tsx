@@ -1,11 +1,15 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 
+import { AppLayout } from '@/components/AppLayout';
 import { GuestRoute } from '@/features/auth/GuestRoute';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { useAuth } from '@/features/auth/useAuth';
+import { LessonPage } from '@/features/lessons/LessonPage';
+import { TopicDetailPage } from '@/features/lessons/TopicDetailPage';
+import { TopicsPage } from '@/features/lessons/TopicsPage';
 import { HomePage } from '@/pages/HomePage';
 
 export function App() {
@@ -24,7 +28,12 @@ export function App() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<HomePage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/topics" element={<TopicsPage />} />
+            <Route path="/topics/:slug" element={<TopicDetailPage />} />
+            <Route path="/lessons/:id" element={<LessonPage />} />
+          </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

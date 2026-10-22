@@ -6,8 +6,8 @@ if (!new URL(process.env.DATABASE_URL!).pathname.endsWith('_test')) {
 }
 
 beforeEach(async () => {
-  // Cascades to every table that references users (refresh tokens, enrollments, ...).
-  await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" CASCADE');
+  // Cascades to everything that references users or content (tokens, topics, lessons, progress, ...).
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "User", "Category" CASCADE');
 });
 
 afterAll(async () => {

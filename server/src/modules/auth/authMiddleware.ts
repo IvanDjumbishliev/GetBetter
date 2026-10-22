@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@shared/constants';
-import type { RequestHandler } from 'express';
+import type { Request, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppError } from '../../lib/errors';
 import { verifyAccessTokenString } from './authService';
@@ -23,3 +23,11 @@ export const verifyAccessToken: RequestHandler = (req, _res, next) => {
     );
   }
 };
+
+/** The authenticated user's id; only valid on routes behind verifyAccessToken. */
+export function getAuthUserId(req: Request): string {
+  if (!req.user) {
+    throw new AppError(401, ERROR_CODES.UNAUTHORIZED, 'Not authenticated');
+  }
+  return req.user.id;
+}

@@ -27,3 +27,23 @@ export const loginSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+
+function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** IANA time zone (e.g. "Europe/Sofia") used to decide what "today" means for streaks. */
+export const timeZoneSchema = z
+  .string()
+  .refine(isValidTimeZone, { error: 'Invalid time zone' })
+  .optional();
+
+export const completeLessonSchema = z.object({ timeZone: timeZoneSchema });
+export const dailyLessonQuerySchema = z.object({ timeZone: timeZoneSchema });
+
+export type CompleteLessonInput = z.infer<typeof completeLessonSchema>;
