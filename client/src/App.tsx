@@ -7,6 +7,8 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { useAuth } from '@/features/auth/useAuth';
+import { CommunityPage } from '@/features/community/CommunityPage';
+import { PostDetailPage } from '@/features/community/PostDetailPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { LessonPage } from '@/features/lessons/LessonPage';
 import { TopicDetailPage } from '@/features/lessons/TopicDetailPage';
@@ -33,6 +35,8 @@ export function App() {
             <Route path="/topics" element={<TopicsPage />} />
             <Route path="/topics/:slug" element={<TopicDetailPage />} />
             <Route path="/lessons/:id" element={<LessonPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/community/:postId" element={<PostDetailPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

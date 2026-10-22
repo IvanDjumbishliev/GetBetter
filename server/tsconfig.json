@@ -12,6 +12,7 @@
   "include": [
     "src",
     "test",
+    "scripts",
     "tsup.config.ts",
     "vitest.config.ts",
     "../shared/src",

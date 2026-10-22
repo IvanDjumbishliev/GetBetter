@@ -15,11 +15,14 @@ export interface ApiErrorBody {
   };
 }
 
+export type UserRole = 'USER' | 'ADMIN';
+
 export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
   avatarUrl: string | null;
+  role: UserRole;
 }
 
 export interface AuthResponse {
@@ -200,4 +203,52 @@ export interface UserStats {
   /** One entry per day, oldest first, ending today; days without activity are included as 0. */
   weeklyActivity: DailyActivity[];
   categoryBreakdown: CategoryProgress[];
+}
+
+/** Public profile shown next to community content (no email). */
+export interface PostAuthor {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
+
+export interface PostTopic {
+  id: string;
+  slug: string;
+  title: string;
+  categoryId: string;
+}
+
+export interface PostSummary {
+  id: string;
+  title: string;
+  /** Plain-text preview of the Markdown body (first ~150 characters). */
+  excerpt: string;
+  createdAt: string;
+  updatedAt: string;
+  commentCount: number;
+  author: PostAuthor;
+  topic: PostTopic | null;
+}
+
+export interface PostsPage {
+  posts: PostSummary[];
+  page: number;
+  limit: number;
+  total: number;
+  hasMore: boolean;
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  body: string;
+  createdAt: string;
+  author: PostAuthor;
+}
+
+export interface PostDetail extends Omit<PostSummary, 'excerpt'> {
+  body: string;
+  /** Oldest first. */
+  comments: PostComment[];
 }

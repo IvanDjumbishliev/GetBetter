@@ -30,6 +30,9 @@ export function AppLayout() {
             <NavLink to="/topics" className={navLinkClass}>
               Topics
             </NavLink>
+            <NavLink to="/community" className={navLinkClass}>
+              Community
+            </NavLink>
           </nav>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-sm text-muted-foreground sm:inline">

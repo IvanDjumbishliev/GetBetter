@@ -27,7 +27,8 @@
     "db:studio": "dotenv -e server/.env -- prisma studio",
     "db:seed": "dotenv -e server/.env -- prisma db seed",
     "db:reset": "dotenv -e server/.env -- prisma migrate reset",
-    "test": "npm run test -w server"
+    "test": "npm run test -w server",
+    "user:set-role": "dotenv -e server/.env -- tsx server/scripts/set-role.ts"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",

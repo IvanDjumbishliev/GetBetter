@@ -42,6 +42,7 @@ describe('POST /api/auth/register', () => {
         email: 'ada@example.com',
         displayName: 'Ada Lovelace',
         avatarUrl: null,
+        role: 'USER',
       },
       accessToken: expect.any(String),
     });

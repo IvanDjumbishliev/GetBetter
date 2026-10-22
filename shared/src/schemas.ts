@@ -74,3 +74,36 @@ export const statsQuerySchema = z.object({
   /** How many days of activity to return, ending today. */
   days: z.coerce.number().int().min(1).max(STATS_MAX_DAYS).default(STATS_DEFAULT_DAYS),
 });
+
+export const createPostSchema = z.object({
+  topicId: z.string().min(1).nullish(),
+  title: z
+    .string()
+    .trim()
+    .min(3, { error: 'Title must be at least 3 characters' })
+    .max(150, { error: 'Title must be at most 150 characters' }),
+  body: z
+    .string()
+    .trim()
+    .min(1, { error: 'Write something before posting' })
+    .max(10_000, { error: 'Post must be at most 10,000 characters' }),
+});
+
+export const createCommentSchema = z.object({
+  body: z
+    .string()
+    .trim()
+    .min(1, { error: 'Comment cannot be empty' })
+    .max(5_000, { error: 'Comment must be at most 5,000 characters' }),
+});
+
+export const postsQuerySchema = z.object({
+  topicId: z.string().min(1).optional(),
+  categoryId: z.string().min(1).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
+export type CreatePostInput = z.infer<typeof createPostSchema>;
+export type CreateCommentInput = z.infer<typeof createCommentSchema>;
+export type PostsQuery = z.infer<typeof postsQuerySchema>;

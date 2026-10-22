@@ -41,6 +41,7 @@ export function toAuthUser(user: User): AuthUser {
     email: user.email,
     displayName: user.displayName,
     avatarUrl: user.avatarUrl,
+    role: user.role,
   };
 }
 

@@ -5,6 +5,7 @@ import express from 'express';
 import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { authRouter } from './modules/auth/authRouter';
+import { commentsRouter, postsRouter } from './modules/community/communityRouter';
 import { lessonsRouter, topicsRouter } from './modules/lessons/lessonsRouter';
 import { meRouter } from './modules/progress/progressRouter';
 import { quizRouter } from './modules/quiz/quizRouter';
@@ -22,6 +23,8 @@ app.use(`${API_PREFIX}/topics`, topicsRouter);
 app.use(`${API_PREFIX}/lessons`, lessonsRouter);
 app.use(`${API_PREFIX}/quiz-attempts`, quizRouter);
 app.use(`${API_PREFIX}/me`, meRouter);
+app.use(`${API_PREFIX}/posts`, postsRouter);
+app.use(`${API_PREFIX}/comments`, commentsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
