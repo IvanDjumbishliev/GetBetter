@@ -15,9 +15,15 @@ export async function createUser() {
   return { id: res.body.user.id as string, token: res.body.accessToken as string };
 }
 
-/** Creates a category + topic with `lessonCount` lessons (orders 1..n). */
+/** Creates a category + topic with `lessonCount` lessons (orders 1..n), each with a flashcard and quiz. */
 export async function createTopic(
-  options: { title?: string; lessonCount?: number; difficulty?: Difficulty } = {},
+  options: {
+    title?: string;
+    lessonCount?: number;
+    /** Quiz questions per lesson; each has options a–d with "a" correct. */
+    questionCount?: number;
+    difficulty?: Difficulty;
+  } = {},
 ) {
   const id = unique();
   const title = options.title ?? `Topic ${id}`;
@@ -35,22 +41,26 @@ export async function createTopic(
           content: `# Lesson ${i + 1}\n\nSome content.`,
           flashcards: { create: [{ front: 'Front', back: 'Back' }] },
           quizQuestions: {
-            create: [
-              {
-                question: 'Q?',
-                options: [
-                  { id: 'a', text: 'A' },
-                  { id: 'b', text: 'B' },
-                ],
-                correctOptionId: 'a',
-                explanation: 'Because.',
-              },
-            ],
+            create: Array.from({ length: options.questionCount ?? 1 }, (_, q) => ({
+              question: `Q${q + 1}?`,
+              options: ['a', 'b', 'c', 'd'].map((optionId) => ({
+                id: optionId,
+                text: optionId.toUpperCase(),
+              })),
+              correctOptionId: 'a',
+              explanation: 'Because.',
+            })),
           },
         })),
       },
     },
-    include: { lessons: { orderBy: { order: 'asc' } }, category: true },
+    include: {
+      lessons: {
+        orderBy: { order: 'asc' },
+        include: { quizQuestions: { orderBy: { id: 'asc' } } },
+      },
+      category: true,
+    },
   });
 }
 

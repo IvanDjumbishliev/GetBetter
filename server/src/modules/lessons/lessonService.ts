@@ -125,10 +125,7 @@ export async function getLesson(id: string, userId: string): Promise<LessonDetai
     include: {
       topic: { include: { category: true } },
       flashcards: { orderBy: { id: 'asc' } },
-      quizQuestions: {
-        orderBy: { id: 'asc' },
-        select: { id: true, question: true, options: true },
-      },
+      quizQuestions: { orderBy: { id: 'asc' } },
       progresses: { where: { userId }, select: { id: true } },
     },
   });
@@ -167,6 +164,8 @@ export async function getLesson(id: string, userId: string): Promise<LessonDetai
       id: q.id,
       question: q.question,
       options: q.options as unknown as QuizOption[],
+      correctOptionId: q.correctOptionId,
+      explanation: q.explanation,
     })),
     previousLesson,
     nextLesson,
@@ -204,6 +203,7 @@ export async function completeLesson(
         completedAt: progress.completedAt.toISOString(),
         alreadyCompleted: true,
         topicCompleted: Boolean(enrollment?.completedAt),
+        streakChanged: false,
         streak: toStreakInfo(user),
       };
     }
@@ -227,13 +227,14 @@ export async function completeLesson(
       });
     }
 
-    const streak = await recordActivity(tx, userId, timeZone, created.completedAt);
+    const { streak, changed } = await recordActivity(tx, userId, timeZone, created.completedAt);
 
     return {
       lessonId,
       completedAt: created.completedAt.toISOString(),
       alreadyCompleted: false,
       topicCompleted,
+      streakChanged: changed,
       streak,
     };
   });

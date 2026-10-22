@@ -89,7 +89,7 @@ describe('POST /api/topics/:slug/enroll', () => {
 });
 
 describe('GET /api/lessons/:id', () => {
-  it('returns content, flashcards and quiz questions without answers', async () => {
+  it('returns content, flashcards and quiz questions with answers', async () => {
     const user = await createUser();
     const topic = await createTopic({ lessonCount: 3 });
     const lesson = topic.lessons[1]!;
@@ -111,11 +111,15 @@ describe('GET /api/lessons/:id', () => {
     expect(res.body.lesson.flashcards).toHaveLength(1);
     expect(res.body.lesson.quizQuestions[0]).toEqual({
       id: expect.any(String),
-      question: 'Q?',
+      question: 'Q1?',
       options: [
         { id: 'a', text: 'A' },
         { id: 'b', text: 'B' },
+        { id: 'c', text: 'C' },
+        { id: 'd', text: 'D' },
       ],
+      correctOptionId: 'a',
+      explanation: 'Because.',
     });
   });
 });
@@ -134,6 +138,7 @@ describe('POST /api/lessons/:id/complete', () => {
     expect(res.body).toMatchObject({
       alreadyCompleted: false,
       topicCompleted: false,
+      streakChanged: true,
       streak: { currentStreak: 1, longestStreak: 1 },
     });
     expect(await prisma.enrollment.count({ where: { userId: user.id } })).toBe(1);
@@ -180,8 +185,33 @@ describe('POST /api/lessons/:id/complete', () => {
     const again = await request(app).post(url).set(auth(user.token)).send({ timeZone: 'UTC' });
 
     expect(again.status).toBe(200);
-    expect(again.body).toMatchObject({ alreadyCompleted: true, streak: { currentStreak: 1 } });
+    expect(again.body).toMatchObject({
+      alreadyCompleted: true,
+      streakChanged: false,
+      streak: { currentStreak: 1 },
+    });
     expect(await prisma.lessonProgress.count({ where: { userId: user.id } })).toBe(1);
+  });
+
+  it('reports no streak change for a second lesson on the same day', async () => {
+    const user = await createUser();
+    const topic = await createTopic({ lessonCount: 2 });
+
+    await request(app)
+      .post(`/api/lessons/${topic.lessons[0]!.id}/complete`)
+      .set(auth(user.token))
+      .send({ timeZone: 'UTC' })
+      .expect(201);
+    const second = await request(app)
+      .post(`/api/lessons/${topic.lessons[1]!.id}/complete`)
+      .set(auth(user.token))
+      .send({ timeZone: 'UTC' });
+
+    expect(second.body).toMatchObject({
+      alreadyCompleted: false,
+      streakChanged: false,
+      streak: { currentStreak: 1 },
+    });
   });
 
   it('marks the enrollment complete after the last lesson', async () => {

@@ -62,12 +62,13 @@ export async function recordActivity(
   userId: string,
   timeZone: string | undefined,
   now = new Date(),
-): Promise<StreakInfo> {
+): Promise<{ streak: StreakInfo; changed: boolean }> {
   const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
   const before = toStreakInfo(user);
   const after = calculateStreak(before, toDateKey(now, timeZone));
 
-  if (after !== before) {
+  const changed = after !== before;
+  if (changed) {
     await tx.user.update({
       where: { id: userId },
       data: {
@@ -77,5 +78,5 @@ export async function recordActivity(
       },
     });
   }
-  return after;
+  return { streak: after, changed };
 }

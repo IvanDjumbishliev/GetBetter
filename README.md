@@ -29,10 +29,13 @@ Welcome to **GetBetter**, an intelligent learning ecosystem designed to transfor
 
 ---
 
-### Why GetBetter?
+## Why GetBetter?
+
 * 🎯 **Zero Friction:** Skip the overwhelming search. Get straight to learning.
 * 💡 **Every Topic Covered:** From niche technical subjects to fascinating general knowledge.
 * 📈 **Daily Upgrades:** Build a habit of getting smarter, one day at a time.
+
+---
 
 ## 🤝 Contributing
 

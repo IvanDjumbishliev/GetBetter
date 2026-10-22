@@ -47,3 +47,21 @@ export const completeLessonSchema = z.object({ timeZone: timeZoneSchema });
 export const dailyLessonQuerySchema = z.object({ timeZone: timeZoneSchema });
 
 export type CompleteLessonInput = z.infer<typeof completeLessonSchema>;
+
+export const quizAnswerSchema = z.object({
+  questionId: z.string().min(1),
+  selectedOptionId: z.string().min(1),
+});
+
+export const createQuizAttemptSchema = z.object({
+  lessonId: z.string().min(1, { error: 'lessonId is required' }),
+  answers: z.array(quizAnswerSchema).min(1, { error: 'At least one answer is required' }).max(100),
+  /** Accepted for convenience but ignored: the server always grades the answers itself. */
+  score: z.number().optional(),
+});
+
+export const quizAttemptsQuerySchema = z.object({
+  lessonId: z.string().min(1, { error: 'lessonId is required' }),
+});
+
+export type CreateQuizAttemptInput = z.infer<typeof createQuizAttemptSchema>;

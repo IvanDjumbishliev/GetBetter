@@ -150,13 +150,16 @@ model LessonProgress {
 }
 
 model QuizAttempt {
-  id          String   @id @default(cuid())
-  userId      String
-  lessonId    String
-  score       Float
-  attemptedAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  lessonId     String
+  /// Fraction correct, 0–1.
+  score        Float
+  correctCount Int
+  totalCount   Int
+  attemptedAt  DateTime @default(now())
   /// Array of { questionId: string, selectedOptionId: string }
-  answers     Json
+  answers      Json
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)

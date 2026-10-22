@@ -70,6 +70,20 @@ export interface QuizOption {
   text: string;
 }
 
+export interface Flashcard {
+  id: string;
+  front: string;
+  back: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: QuizOption[];
+  correctOptionId: string;
+  explanation: string;
+}
+
 export interface LessonNavItem {
   id: string;
   order: number;
@@ -85,9 +99,12 @@ export interface LessonDetail {
   readMinutes: number;
   isCompleted: boolean;
   topic: { id: string; slug: string; title: string; category: CategorySummary };
-  flashcards: { id: string; front: string; back: string }[];
-  /** Correct answers and explanations are deliberately not sent to the client. */
-  quizQuestions: { id: string; question: string; options: QuizOption[] }[];
+  flashcards: Flashcard[];
+  /**
+   * Includes answers so the quiz can give instant feedback. Scores are still graded
+   * server-side when an attempt is submitted, so they can't be forged.
+   */
+  quizQuestions: QuizQuestion[];
   previousLesson: LessonNavItem | null;
   nextLesson: LessonNavItem | null;
 }
@@ -111,6 +128,8 @@ export interface CompleteLessonResponse {
   alreadyCompleted: boolean;
   /** True once every lesson in the topic is complete. */
   topicCompleted: boolean;
+  /** False when the user had already been active today (or re-completed a lesson). */
+  streakChanged: boolean;
   streak: StreakInfo;
 }
 
@@ -131,4 +150,27 @@ export interface DailyLesson {
 
 export interface DailyLessonResponse {
   dailyLesson: DailyLesson | null;
+}
+
+export interface QuizAnswer {
+  questionId: string;
+  selectedOptionId: string;
+}
+
+export interface QuizAttemptResult {
+  id: string;
+  /** Fraction of questions answered correctly, 0–1. */
+  score: number;
+  correctCount: number;
+  totalCount: number;
+  attemptedAt: string;
+}
+
+export interface QuizAttempt extends QuizAttemptResult {
+  lessonId: string;
+  answers: QuizAnswer[];
+}
+
+export interface QuizAttemptsResponse {
+  attempts: QuizAttempt[];
 }
