@@ -33,6 +33,20 @@ model User {
   quizAttempts   QuizAttempt[]
   communityPosts CommunityPost[]
   comments       Comment[]
+  refreshTokens  RefreshToken[]
+}
+
+/// One row per issued refresh token (keyed by the JWT `jti`) so sessions can be revoked.
+model RefreshToken {
+  id        String    @id
+  userId    String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Category {

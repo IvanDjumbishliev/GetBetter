@@ -5,10 +5,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   CLIENT_URL: z.url().default('http://localhost:5173'),
   DATABASE_URL: z.string().min(1),
-  JWT_ACCESS_SECRET: z.string().min(32),
-  JWT_REFRESH_SECRET: z.string().min(32),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  ACCESS_TOKEN_SECRET: z.string().min(32),
+  REFRESH_TOKEN_SECRET: z.string().min(32),
+  ACCESS_TOKEN_EXPIRES_IN: z.string().default('15m'),
+  REFRESH_TOKEN_EXPIRES_IN: z.string().default('7d'),
 });
 
 // Treat empty strings (e.g. copied straight from .env.example) as unset so defaults apply.
@@ -18,6 +18,11 @@ const parsed = envSchema.safeParse(raw);
 
 if (!parsed.success) {
   console.error('Invalid environment variables:', z.flattenError(parsed.error).fieldErrors);
+  process.exit(1);
+}
+
+if (parsed.data.ACCESS_TOKEN_SECRET === parsed.data.REFRESH_TOKEN_SECRET) {
+  console.error('ACCESS_TOKEN_SECRET and REFRESH_TOKEN_SECRET must be different.');
   process.exit(1);
 }
 

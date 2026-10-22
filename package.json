@@ -26,7 +26,8 @@
     "db:deploy": "dotenv -e server/.env -- prisma migrate deploy",
     "db:studio": "dotenv -e server/.env -- prisma studio",
     "db:seed": "dotenv -e server/.env -- prisma db seed",
-    "db:reset": "dotenv -e server/.env -- prisma migrate reset"
+    "db:reset": "dotenv -e server/.env -- prisma migrate reset",
+    "test": "npm run test -w server"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",
