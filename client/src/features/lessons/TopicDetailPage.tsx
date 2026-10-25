@@ -2,6 +2,7 @@ import type { TopicDetail } from '@shared/types';
 import { ChevronRight, Circle, CircleCheck, Clock, Layers, Users } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 
+import { ProgressBar } from '@/components/ProgressBar';
 import { QueryError } from '@/components/QueryError';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,8 +42,8 @@ function TopicDetailView({ topic }: { topic: TopicDetail }) {
         aria-label="Breadcrumb"
         className="flex items-center gap-1 text-sm text-muted-foreground"
       >
-        <Link to="/topics" className="hover:text-foreground">
-          Topics
+        <Link to="/explore" className="hover:text-foreground">
+          Explore
         </Link>
         <ChevronRight aria-hidden className="h-4 w-4" />
         <span className="flex items-center gap-1">
@@ -87,16 +88,7 @@ function TopicDetailView({ topic }: { topic: TopicDetail }) {
                 {topic.completedLessonCount} of {topic.lessonCount} lessons
               </span>
             </div>
-            <div
-              className="h-2 overflow-hidden rounded-full bg-secondary"
-              role="progressbar"
-              aria-label="Topic progress"
-              aria-valuenow={Math.round(progress)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
-            </div>
+            <ProgressBar value={progress} label="Topic progress" />
             {nextLesson && (
               <Button asChild>
                 <Link to={`/lessons/${nextLesson.id}`}>

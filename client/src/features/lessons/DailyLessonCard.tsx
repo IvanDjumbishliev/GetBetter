@@ -31,7 +31,7 @@ export function DailyLessonCard() {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link to="/topics">Browse topics</Link>
+            <Link to="/explore">Browse topics</Link>
           </Button>
         </CardContent>
       </Card>

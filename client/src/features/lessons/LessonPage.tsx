@@ -131,8 +131,8 @@ function LessonHeader({ lesson }: { lesson: LessonDetail }) {
         aria-label="Breadcrumb"
         className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
       >
-        <Link to="/topics" className="hover:text-foreground">
-          Topics
+        <Link to="/explore" className="hover:text-foreground">
+          Explore
         </Link>
         <ChevronRight aria-hidden className="h-4 w-4" />
         <Link to={`/topics/${lesson.topic.slug}`} className="hover:text-foreground">

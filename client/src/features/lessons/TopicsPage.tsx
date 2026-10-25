@@ -1,17 +1,15 @@
 import type { CategorySummary, Difficulty, TopicSummary } from '@shared/types';
-import { CircleCheck, Clock, Layers, Search, Users } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { QueryError } from '@/components/QueryError';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TopicCard } from '@/components/TopicCard';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryIcon } from './CategoryIcon';
 import { DIFFICULTY_LABELS } from './difficulty';
-import { DifficultyBadge } from './DifficultyBadge';
 import { useTopicsQuery } from './lessonsApi';
 
 const ALL = 'all';
@@ -33,6 +31,8 @@ function groupByCategory(topics: TopicSummary[]): CategoryGroup[] {
 
 export function TopicsPage() {
   const topicsQuery = useTopicsQuery();
+  const [searchParams] = useSearchParams();
+  const enrolledOnly = searchParams.get('enrolled') === '1';
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState(ALL);
   const [difficulty, setDifficulty] = useState<Difficulty | typeof ALL>(ALL);
@@ -47,6 +47,7 @@ export function TopicsPage() {
     const query = search.trim().toLowerCase();
     const filtered = (topics ?? []).filter(
       (topic) =>
+        (!enrolledOnly || topic.isEnrolled) &&
         (categoryId === ALL || topic.category.id === categoryId) &&
         (difficulty === ALL || topic.difficulty === difficulty) &&
         (!query ||
@@ -55,13 +56,19 @@ export function TopicsPage() {
           )),
     );
     return groupByCategory(filtered);
-  }, [topics, search, categoryId, difficulty]);
+  }, [topics, search, categoryId, difficulty, enrolledOnly]);
 
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Explore topics</h1>
-        <p className="text-muted-foreground">Pick something new to learn, one lesson a day.</p>
+        <h1 className="font-display text-3xl tracking-tight">
+          {enrolledOnly ? 'My Learning' : 'Explore'}
+        </h1>
+        <p className="text-muted-foreground">
+          {enrolledOnly
+            ? 'Topics you are enrolled in — pick up the next lesson and keep the streak.'
+            : 'Pick something new to learn, one lesson a day.'}
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row" role="search">
@@ -110,10 +117,12 @@ export function TopicsPage() {
         <QueryError error={topicsQuery.error} onRetry={() => void topicsQuery.refetch()} />
       )}
       {topicsQuery.isSuccess && groups.length === 0 && (
-        <p className="py-12 text-center text-muted-foreground">No topics match your filters.</p>
+        <p className="py-12 text-center text-muted-foreground">
+          {enrolledOnly ? 'You have not enrolled in any matching topics yet.' : 'No topics match your filters.'}
+        </p>
       )}
 
-      {groups.map(({ category, topics }) => (
+      {groups.map(({ category, topics: groupTopics }) => (
         <section
           key={category.id}
           aria-labelledby={`category-${category.id}`}
@@ -127,7 +136,7 @@ export function TopicsPage() {
             {category.name}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {topics.map((topic) => (
+            {groupTopics.map((topic) => (
               <TopicCard key={topic.id} topic={topic} />
             ))}
           </div>
@@ -137,51 +146,11 @@ export function TopicsPage() {
   );
 }
 
-function TopicCard({ topic }: { topic: TopicSummary }) {
-  return (
-    <Link
-      to={`/topics/${topic.slug}`}
-      className="group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <Card className="flex h-full flex-col transition-colors group-hover:border-primary/40">
-        <CardHeader className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <DifficultyBadge difficulty={topic.difficulty} />
-            {topic.isEnrolled && (
-              <Badge variant="secondary">
-                <CircleCheck aria-hidden className="h-3 w-3" />
-                Enrolled
-              </Badge>
-            )}
-          </div>
-          <CardTitle className="text-lg">{topic.title}</CardTitle>
-          {topic.description && (
-            <CardDescription className="line-clamp-2">{topic.description}</CardDescription>
-          )}
-        </CardHeader>
-        <CardContent className="mt-auto flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Layers aria-hidden className="h-3.5 w-3.5" />
-            {topic.lessonCount} lessons
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock aria-hidden className="h-3.5 w-3.5" />~{topic.estimatedMinutes} min
-          </span>
-          <span className="flex items-center gap-1">
-            <Users aria-hidden className="h-3.5 w-3.5" />
-            {topic.enrollmentCount} enrolled
-          </span>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 function TopicsSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Loading topics">
       {Array.from({ length: 6 }, (_, i) => (
-        <Skeleton key={i} className="h-44 rounded-xl" />
+        <Skeleton key={i} className="h-44 rounded-lg" />
       ))}
     </div>
   );

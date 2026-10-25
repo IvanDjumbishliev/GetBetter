@@ -12,6 +12,20 @@ export default {
       screens: { '2xl': '1400px' },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"DM Serif Display"', 'ui-serif', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        xs: ['var(--text-xs)', { lineHeight: 'var(--leading-xs)', letterSpacing: 'var(--tracking-xs)' }],
+        sm: ['var(--text-sm)', { lineHeight: 'var(--leading-sm)', letterSpacing: 'var(--tracking-sm)' }],
+        base: ['var(--text-base)', { lineHeight: 'var(--leading-base)', letterSpacing: 'var(--tracking-base)' }],
+        lg: ['var(--text-lg)', { lineHeight: 'var(--leading-lg)', letterSpacing: 'var(--tracking-lg)' }],
+        xl: ['var(--text-xl)', { lineHeight: 'var(--leading-xl)', letterSpacing: 'var(--tracking-xl)' }],
+        '2xl': ['var(--text-2xl)', { lineHeight: 'var(--leading-2xl)', letterSpacing: 'var(--tracking-2xl)' }],
+        '3xl': ['var(--text-3xl)', { lineHeight: 'var(--leading-3xl)', letterSpacing: 'var(--tracking-3xl)' }],
+        '4xl': ['var(--text-4xl)', { lineHeight: 'var(--leading-4xl)', letterSpacing: 'var(--tracking-4xl)' }],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

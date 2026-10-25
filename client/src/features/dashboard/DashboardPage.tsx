@@ -1,4 +1,5 @@
-import { Link } from 'react-router';
+import { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router';
 
 import { QueryError } from '@/components/QueryError';
 import { Button } from '@/components/ui/button';
@@ -20,11 +21,17 @@ export function DashboardPage() {
   const user = useAuth((s) => s.user);
   const statsQuery = useStatsQuery(heatmapDays(HEATMAP_WEEKS, todayKey()));
   const stats = statsQuery.data;
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('view') !== 'progress') return;
+    document.getElementById('progress')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [searchParams]);
 
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="font-display text-3xl tracking-tight">
           Hello, {user?.displayName ?? 'learner'}!
         </h1>
         <p className="text-muted-foreground">Ready to get a little better today?</p>
@@ -45,17 +52,19 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {stats ? (
-        <StatsGrid {...stats} />
-      ) : (
-        !statsQuery.isError && (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 4 }, (_, i) => (
-              <Skeleton key={i} className="h-28 rounded-xl" />
-            ))}
-          </div>
-        )
-      )}
+      <div id="progress">
+        {stats ? (
+          <StatsGrid {...stats} />
+        ) : (
+          !statsQuery.isError && (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} className="h-28 rounded-lg" />
+              ))}
+            </div>
+          )
+        )}
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
         <Card className="lg:col-span-2">
@@ -87,7 +96,7 @@ export function DashboardPage() {
       </div>
 
       <Button asChild variant="link" className="px-0">
-        <Link to="/topics">Browse all topics →</Link>
+        <Link to="/explore">Browse all topics →</Link>
       </Button>
     </div>
   );

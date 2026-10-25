@@ -4,8 +4,11 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '@/App';
+import { injectDesignTokens } from '@/design-system/tokens';
 import { queryClient } from '@/lib/query-client';
 import './index.css';
+
+injectDesignTokens();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

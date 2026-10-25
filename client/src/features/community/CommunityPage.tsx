@@ -69,7 +69,7 @@ export function CommunityPage() {
 
   return (
     <div className="grid gap-8 md:grid-cols-[15rem_1fr]">
-      <aside className="md:sticky md:top-6 md:max-h-[calc(100vh-3rem)] md:self-start md:overflow-y-auto">
+      <aside className="md:sticky md:top-24 md:max-h-[calc(100vh-7rem)] md:self-start md:overflow-y-auto">
         <CommunityFilters topics={topics} filter={filter} onChange={setFilter} />
       </aside>
 

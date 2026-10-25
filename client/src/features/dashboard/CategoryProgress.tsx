@@ -1,5 +1,7 @@
 import type { CategoryProgress as CategoryProgressItem } from '@shared/types';
 
+import { ProgressBar } from '@/components/ProgressBar';
+import { colors } from '@/design-system/tokens';
 import { CategoryIcon } from '@/features/lessons/CategoryIcon';
 
 const percent = new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 0 });
@@ -32,20 +34,11 @@ export function CategoryProgress({ categories }: { categories: CategoryProgressI
                 <span className="ml-2 inline-block w-9 text-right">{percent.format(ratio)}</span>
               </span>
             </div>
-            {/* Track is the lightest step of the same ramp as the fill. */}
-            <div
-              role="progressbar"
-              aria-label={`${category.categoryName}: ${category.lessonsCompleted} of ${category.totalLessons} lessons completed`}
-              aria-valuemin={0}
-              aria-valuemax={category.totalLessons}
-              aria-valuenow={category.lessonsCompleted}
-              className="h-2.5 overflow-hidden rounded-[4px] bg-heat-0"
-            >
-              <div
-                className="h-full rounded-r-[4px] bg-heat-3 transition-[width] duration-500 motion-reduce:transition-none"
-                style={{ width: `${ratio * 100}%` }}
-              />
-            </div>
+            <ProgressBar
+              value={ratio * 100}
+              color={colors.accent}
+              label={`${category.categoryName}: ${category.lessonsCompleted} of ${category.totalLessons} lessons completed`}
+            />
           </li>
         );
       })}

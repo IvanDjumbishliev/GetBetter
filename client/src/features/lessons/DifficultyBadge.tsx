@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils';
 import { DIFFICULTY_LABELS } from './difficulty';
 
 const DIFFICULTY_CLASSES: Record<Difficulty, string> = {
-  BEGINNER: 'border-emerald-500/40 text-emerald-700 dark:text-emerald-400',
-  INTERMEDIATE: 'border-amber-500/40 text-amber-700 dark:text-amber-400',
-  ADVANCED: 'border-rose-500/40 text-rose-700 dark:text-rose-400',
+  BEGINNER: 'border-emerald-400/40 text-emerald-300',
+  INTERMEDIATE: 'border-sky-400/40 text-sky-300',
+  ADVANCED: 'border-violet-400/40 text-violet-300',
 };
 
 export function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {

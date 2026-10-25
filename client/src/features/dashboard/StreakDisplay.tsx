@@ -1,6 +1,5 @@
-import { Flame } from 'lucide-react';
-
 import { Card, CardContent } from '@/components/ui/card';
+import { StreakBadge } from '@/components/StreakBadge';
 import { cn } from '@/lib/utils';
 
 interface StreakDisplayProps {
@@ -17,10 +16,7 @@ export function StreakDisplay({ currentStreak, longestStreak, className }: Strea
   return (
     <Card className={cn('flex', className)}>
       <CardContent className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-        <Flame
-          aria-hidden
-          className={cn('h-10 w-10', isActive ? 'text-orange-500' : 'text-muted-foreground/50')}
-        />
+        <StreakBadge streak={currentStreak} className="px-3 py-1.5 text-sm" />
         <p className="text-6xl font-bold leading-none tracking-tight">{currentStreak}</p>
         <p className="text-sm font-medium text-muted-foreground">day streak</p>
         {isActive ? (
