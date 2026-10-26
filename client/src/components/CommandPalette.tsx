@@ -1,7 +1,7 @@
 import type { PostSummary, TopicSummary } from '@shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { FileText, Layers, Search } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -13,9 +13,7 @@ import { cn } from '@/lib/utils';
 type FeedPage = { posts: PostSummary[] };
 type FeedData = { pages: FeedPage[] };
 
-type PaletteItem =
-  | { kind: 'topic'; topic: TopicSummary }
-  | { kind: 'post'; post: PostSummary };
+type PaletteItem = { kind: 'topic'; topic: TopicSummary } | { kind: 'post'; post: PostSummary };
 
 function cachedTopics(queryClient: ReturnType<typeof useQueryClient>): TopicSummary[] {
   return queryClient.getQueryData<TopicSummary[]>(lessonKeys.topics()) ?? [];
@@ -24,7 +22,9 @@ function cachedTopics(queryClient: ReturnType<typeof useQueryClient>): TopicSumm
 function cachedPosts(queryClient: ReturnType<typeof useQueryClient>): PostSummary[] {
   const seen = new Set<string>();
   const posts: PostSummary[] = [];
-  for (const [, data] of queryClient.getQueriesData<FeedData>({ queryKey: communityKeys.feeds() })) {
+  for (const [, data] of queryClient.getQueriesData<FeedData>({
+    queryKey: communityKeys.feeds(),
+  })) {
     for (const page of data?.pages ?? []) {
       for (const post of page.posts) {
         if (!seen.has(post.id)) {
@@ -40,69 +40,70 @@ function cachedPosts(queryClient: ReturnType<typeof useQueryClient>): PostSummar
 export function CommandPalette() {
   const isOpen = useCommandPalette((s) => s.isOpen);
   const close = useCommandPalette((s) => s.close);
-  const toggle = useCommandPalette((s) => s.toggle);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
 
+  const closePalette = useCallback(() => {
+    setQuery('');
+    setActive(0);
+    close();
+  }, [close]);
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        toggle();
+        if (isOpen) closePalette();
+        else useCommandPalette.getState().open();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle]);
+  }, [closePalette, isOpen]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setQuery('');
-      setActive(0);
-      return;
-    }
+    if (!isOpen) return;
     const id = window.setTimeout(() => inputRef.current?.focus(), 10);
     return () => window.clearTimeout(id);
   }, [isOpen]);
 
-  const items = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    const topics = cachedTopics(queryClient);
-    const posts = cachedPosts(queryClient);
-    const topicHits: PaletteItem[] = topics
-      .filter(
-        (topic) =>
-          !needle ||
-          [topic.title, topic.description ?? '', topic.category.name].some((text) =>
-            text.toLowerCase().includes(needle),
-          ),
-      )
-      .slice(0, 8)
-      .map((topic) => ({ kind: 'topic', topic }));
-    const postHits: PaletteItem[] = posts
-      .filter(
-        (post) =>
-          !needle ||
-          [post.title, post.excerpt, post.author.displayName].some((text) =>
-            text.toLowerCase().includes(needle),
-          ),
-      )
-      .slice(0, 8)
-      .map((post) => ({ kind: 'post', post }));
-    return [...topicHits, ...postHits];
-  }, [query, queryClient, isOpen]);
+  const needle = query.trim().toLowerCase();
+  const topicHits: PaletteItem[] = cachedTopics(queryClient)
+    .filter(
+      (topic) =>
+        !needle ||
+        [topic.title, topic.description ?? '', topic.category.name].some((text) =>
+          text.toLowerCase().includes(needle),
+        ),
+    )
+    .slice(0, 8)
+    .map((topic) => ({ kind: 'topic', topic }));
+  const postHits: PaletteItem[] = cachedPosts(queryClient)
+    .filter(
+      (post) =>
+        !needle ||
+        [post.title, post.excerpt, post.author.displayName].some((text) =>
+          text.toLowerCase().includes(needle),
+        ),
+    )
+    .slice(0, 8)
+    .map((post) => ({ kind: 'post', post }));
+  const items = [...topicHits, ...postHits];
 
   const go = (item: PaletteItem) => {
-    close();
+    closePalette();
     if (item.kind === 'topic') navigate(`/topics/${item.topic.slug}`);
     else navigate(`/community/${item.post.id}`);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => (open ? useCommandPalette.getState().open() : close())}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => (open ? useCommandPalette.getState().open() : closePalette())}
+    >
       <DialogContent className="top-[18%] translate-y-0 gap-0 overflow-hidden border-border p-0 shadow-[var(--gb-shadow-overlay)] sm:max-w-lg sm:rounded-lg [&>button.absolute]:hidden">
         <DialogTitle className="sr-only">Search topics and posts</DialogTitle>
         <DialogDescription className="sr-only">

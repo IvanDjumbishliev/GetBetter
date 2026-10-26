@@ -22,6 +22,7 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgresql://getbetter:getbetter@localhost:5432/getbetter_test?schema=public
+      DATABASE_URL: postgresql://getbetter:getbetter@localhost:5432/getbetter_test?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

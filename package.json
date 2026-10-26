@@ -30,10 +30,6 @@
     "test": "npm run test --workspaces --if-present",
     "user:set-role": "dotenv -e server/.env -- tsx server/scripts/set-role.ts"
   },
-  "prisma": {
-    "schema": "prisma/schema.prisma",
-    "seed": "tsx prisma/seed.ts"
-  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "concurrently": "^10.0.6",
@@ -43,11 +39,18 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.0.0",
+    "jsdom": "^26.1.0",
     "prettier": "^3.9.0",
     "prettier-plugin-tailwindcss": "^0.6.0",
-    "prisma": "^6.19.0",
+    "prisma": "^7.10.1",
     "tsx": "^4.20.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.72.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.10.1"
+  },
+  "overrides": {
+    "postcss-selector-parser": "^7.1.6"
   }
 }
