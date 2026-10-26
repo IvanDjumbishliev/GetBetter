@@ -43,6 +43,10 @@ describe('POST /api/auth/register', () => {
         displayName: 'Ada Lovelace',
         avatarUrl: null,
         role: 'USER',
+        onboardingCompletedAt: null,
+        dailyGoalMinutes: null,
+        reminderTime: null,
+        preferredTimeZone: null,
       },
       accessToken: expect.any(String),
     });

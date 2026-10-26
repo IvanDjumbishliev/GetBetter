@@ -1,10 +1,12 @@
 import { statsQuerySchema } from '@shared/schemas';
 import type { UserStats } from '@shared/types';
 import type { Request, Response } from 'express';
-import { getCached, getCacheVersion } from '../../lib/cache';
-import { validateQuery } from '../../middleware/validate';
+import { onboardingSchema } from '@shared/schemas';
+import { getCached, getCacheVersion, invalidateCacheVersion } from '../../lib/cache';
+import { parseOrThrow, validateQuery } from '../../middleware/validate';
 import { getAuthUserId } from '../auth/authMiddleware';
 import * as progressService from './progressService';
+import * as onboardingService from './onboardingService';
 
 export async function getStats(req: Request, res: Response) {
   const query = validateQuery(statsQuerySchema, req.query);
@@ -15,4 +17,15 @@ export async function getStats(req: Request, res: Response) {
     progressService.getUserStats(userId, query),
   );
   res.json(body);
+}
+
+export async function completeOnboarding(req: Request, res: Response) {
+  const userId = getAuthUserId(req);
+  const input = parseOrThrow(onboardingSchema, req.body);
+  const result = await onboardingService.completeOnboarding(userId, input);
+  await Promise.all([
+    invalidateCacheVersion('cache-version:topics'),
+    invalidateCacheVersion(`cache-version:stats:${userId}`),
+  ]);
+  res.status(201).json(result);
 }

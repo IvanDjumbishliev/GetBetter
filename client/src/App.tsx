@@ -7,10 +7,13 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FullPageLoader } from '@/components/FullPageLoader';
 import { GuestRoute } from '@/features/auth/GuestRoute';
 import { HomeRoute } from '@/features/auth/HomeRoute';
-import { ProfilePage } from '@/features/auth/ProfilePage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
+import { OnboardingGate } from '@/features/onboarding/OnboardingGate';
 import { useAuth } from '@/features/auth/useAuth';
 
+const ProfilePage = lazy(() =>
+  import('@/features/auth/ProfilePage').then((module) => ({ default: module.ProfilePage })),
+);
 const LoginPage = lazy(() =>
   import('@/features/auth/LoginPage').then((module) => ({ default: module.LoginPage })),
 );
@@ -55,24 +58,33 @@ export function App() {
   }, [initialize]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<GuestRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/topics" element={<TopicsPage />} />
-            <Route path="/topics/:slug" element={<TopicDetailPage />} />
-            <Route path="/lessons/:id" element={<LessonPage />} />
-            <Route path="/community" element={<CommunityPage />} />
-            <Route path="/community/:postId" element={<PostDetailPage />} />
-          </Route>
-        </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Suspense fallback={<FullPageLoader />}>
+          <Routes>
+            <Route path="/" element={<HomeRoute />} />
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route element={<OnboardingGate />}>
+                <Route element={<AppShell />}>
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/topics" element={<TopicsPage />} />
+                  <Route path="/topics/:slug" element={<TopicDetailPage />} />
+                  <Route path="/lessons/:id" element={<LessonPage />} />
+                  <Route path="/community" element={<CommunityPage />} />
+                  <Route path="/community/:postId" element={<PostDetailPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
+              </Route>
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+        <ToastContainer />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

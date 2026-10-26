@@ -8,6 +8,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { useLogoutMutation } from '@/features/auth/authApi';
 import { useAuth } from '@/features/auth/useAuth';
 import { useStatsQuery } from '@/features/dashboard/dashboardApi';
+import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { heatmapDays } from '@/features/dashboard/dates';
 import { todayKey } from '@/lib/time-zone';
 import { useCommandPalette } from '@/stores/command-palette';
@@ -84,6 +85,7 @@ export function Navbar({ sidebarOpen, onToggleSidebar }: NavbarProps) {
         {stats.data && (
           <StreakBadge streak={stats.data.currentStreak} className="hidden sm:inline-flex" />
         )}
+        <NotificationBell />
 
         <div className="relative ml-0 sm:ml-1" ref={wrapRef}>
           <button
@@ -109,7 +111,9 @@ export function Navbar({ sidebarOpen, onToggleSidebar }: NavbarProps) {
               role="menu"
               className="absolute right-0 mt-2 w-48 overflow-hidden rounded-md border border-border bg-card py-1 shadow-[var(--gb-shadow-overlay)]"
             >
-              <p className="truncate px-3 py-2 text-xs text-muted-foreground">{user?.displayName}</p>
+              <p className="truncate px-3 py-2 text-xs text-muted-foreground">
+                {user?.displayName}
+              </p>
               <MenuItem
                 icon={UserRound}
                 label="Profile"

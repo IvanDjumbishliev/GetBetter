@@ -14,6 +14,7 @@ interface AuthState {
   /** True until the initial session restore (via the refresh cookie) has finished. */
   isInitializing: boolean;
   setSession: (session: AuthResponse) => void;
+  setUser: (user: AuthUser) => void;
   clearSession: () => void;
   login: (input: LoginInput) => Promise<AuthUser>;
   logout: () => Promise<void>;
@@ -32,6 +33,7 @@ export const useAuth = create<AuthState>()((set, get) => ({
   isInitializing: true,
 
   setSession: ({ user, accessToken }) => set({ user, accessToken, isAuthenticated: true }),
+  setUser: (user) => set({ user }),
 
   clearSession: () => set({ user: null, accessToken: null, isAuthenticated: false }),
 

@@ -7,7 +7,7 @@ describe('StreakDisplay', () => {
   it('shows the current streak', () => {
     render(<StreakDisplay currentStreak={7} longestStreak={12} />);
 
-    expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.getAllByText('7')).toHaveLength(2);
     expect(screen.getByText('Best streak: 12 days')).toBeInTheDocument();
   });
 

@@ -42,6 +42,10 @@ export function toAuthUser(user: User): AuthUser {
     displayName: user.displayName,
     avatarUrl: user.avatarUrl,
     role: user.role,
+    onboardingCompletedAt: user.onboardingCompletedAt?.toISOString() ?? null,
+    dailyGoalMinutes: user.dailyGoalMinutes,
+    reminderTime: user.reminderTime,
+    preferredTimeZone: user.preferredTimeZone,
   };
 }
 

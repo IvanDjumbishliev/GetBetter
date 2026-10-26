@@ -24,6 +24,25 @@ export interface AuthUser {
   displayName: string;
   avatarUrl: string | null;
   role: UserRole;
+  onboardingCompletedAt: string | null;
+  dailyGoalMinutes: number | null;
+  reminderTime: string | null;
+  preferredTimeZone: string | null;
+}
+
+export type NotificationType = 'STREAK_REMINDER' | 'NEW_REPLY' | 'STREAK_BROKEN' | 'MILESTONE';
+
+export interface UserNotification {
+  id: string;
+  type: NotificationType;
+  message: string;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationsResponse {
+  notifications: UserNotification[];
+  unreadCount: number;
 }
 
 export interface AuthResponse {

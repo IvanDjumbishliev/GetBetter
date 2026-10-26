@@ -130,19 +130,29 @@ export async function addComment(
   userId: string,
   input: CreateCommentInput,
 ): Promise<PostComment> {
-  try {
-    const comment = await prisma.comment.create({
+  return prisma.$transaction(async (tx) => {
+    const post = await tx.communityPost.findUnique({
+      where: { id: postId },
+      select: { userId: true, title: true },
+    });
+    if (!post) throw notFound('Post');
+
+    const comment = await tx.comment.create({
       data: { postId, userId, body: input.body },
       include: { user: authorSelect },
     });
-    return toPostComment(comment);
-  } catch (error) {
-    // Foreign key violation: the post doesn't exist (or was just deleted).
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
-      throw notFound('Post');
+    if (post.userId !== userId) {
+      await tx.notification.create({
+        data: {
+          userId: post.userId,
+          type: 'NEW_REPLY',
+          message: `${comment.user.displayName} replied to your post "${post.title}"`,
+          dedupeKey: `new-reply:${comment.id}`,
+        },
+      });
     }
-    throw error;
-  }
+    return toPostComment(comment);
+  });
 }
 
 export async function deletePost(id: string, userId: string): Promise<void> {

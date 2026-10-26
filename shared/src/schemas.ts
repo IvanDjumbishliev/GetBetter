@@ -104,6 +104,22 @@ export const postsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
 });
 
+export const onboardingSchema = z
+  .object({
+    selectedCategoryIds: z.array(z.string().min(1)).min(1).max(3),
+    dailyGoalMinutes: z.union([z.literal(5), z.literal(10), z.literal(15)]),
+    reminderTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, {
+      error: 'Enter a valid reminder time',
+    }),
+    timeZone: timeZoneSchema,
+  })
+  .refine(
+    ({ selectedCategoryIds }) => new Set(selectedCategoryIds).size === selectedCategoryIds.length,
+    { path: ['selectedCategoryIds'], error: 'Choose each category only once' },
+  );
+
+export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type PostsQuery = z.infer<typeof postsQuerySchema>;

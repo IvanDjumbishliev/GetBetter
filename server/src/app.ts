@@ -10,6 +10,7 @@ import { authRouter } from './modules/auth/authRouter';
 import { commentsRouter, postsRouter } from './modules/community/communityRouter';
 import { lessonsRouter, topicsRouter } from './modules/lessons/lessonsRouter';
 import { meRouter } from './modules/progress/progressRouter';
+import { notificationRouter } from './modules/notifications/notificationRouter';
 import { quizRouter } from './modules/quiz/quizRouter';
 import { healthRouter } from './routes/health';
 
@@ -35,6 +36,7 @@ app.use(`${API_PREFIX}/topics`, topicsRouter);
 app.use(`${API_PREFIX}/lessons`, lessonsRouter);
 app.use(`${API_PREFIX}/quiz-attempts`, quizRouter);
 app.use(`${API_PREFIX}/me`, meRouter);
+app.use(`${API_PREFIX}/notifications`, notificationRouter);
 app.use(`${API_PREFIX}/posts`, postsRouter);
 app.use(`${API_PREFIX}/comments`, commentsRouter);
 

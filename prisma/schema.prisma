@@ -21,18 +21,29 @@ enum Difficulty {
   ADVANCED
 }
 
+enum NotificationType {
+  STREAK_REMINDER
+  NEW_REPLY
+  STREAK_BROKEN
+  MILESTONE
+}
+
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  passwordHash     String
-  displayName      String
-  avatarUrl        String?
-  role             Role      @default(USER)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  currentStreak    Int       @default(0)
-  longestStreak    Int       @default(0)
-  lastActivityDate DateTime? @db.Date
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  passwordHash          String
+  displayName           String
+  avatarUrl             String?
+  role                  Role      @default(USER)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  currentStreak         Int       @default(0)
+  longestStreak         Int       @default(0)
+  lastActivityDate      DateTime? @db.Date
+  onboardingCompletedAt DateTime?
+  dailyGoalMinutes      Int?
+  reminderTime          String?
+  preferredTimeZone     String?
 
   enrollments    Enrollment[]
   progresses     LessonProgress[]
@@ -40,6 +51,7 @@ model User {
   communityPosts CommunityPost[]
   comments       Comment[]
   refreshTokens  RefreshToken[]
+  notifications  Notification[]
 }
 
 /// One row per issued refresh token (keyed by the JWT `jti`) so sessions can be revoked.
@@ -204,4 +216,19 @@ model Comment {
 
   @@index([postId, createdAt])
   @@index([userId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  dedupeKey String?          @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }

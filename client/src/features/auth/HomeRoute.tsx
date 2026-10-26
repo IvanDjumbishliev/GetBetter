@@ -1,8 +1,12 @@
+import { lazy } from 'react';
 import { Navigate } from 'react-router';
 
 import { FullPageLoader } from '@/components/FullPageLoader';
-import { LandingPage } from '@/features/landing/LandingPage';
 import { useAuth } from './useAuth';
+
+const LandingPage = lazy(() =>
+  import('@/features/landing/LandingPage').then((module) => ({ default: module.LandingPage })),
+);
 
 /** `/` → dashboard when signed in, otherwise the public landing page. */
 export function HomeRoute() {

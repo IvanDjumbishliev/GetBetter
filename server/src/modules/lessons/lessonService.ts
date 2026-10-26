@@ -12,6 +12,7 @@ import type {
 import type { Category, Topic } from '@prisma/client';
 import { AppError } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
+import { createMilestoneNotifications } from '../notifications/notificationService';
 import { fromDbDate, recordActivity, toDateKey, toStreakInfo } from '../../services/streakService';
 
 const WORDS_PER_MINUTE = 200;
@@ -228,6 +229,8 @@ export async function completeLesson(
     }
 
     const { streak, changed } = await recordActivity(tx, userId, timeZone, created.completedAt);
+    const completedLessonCount = await tx.lessonProgress.count({ where: { userId } });
+    await createMilestoneNotifications(tx, userId, completedLessonCount, streak.currentStreak);
 
     return {
       lessonId,
