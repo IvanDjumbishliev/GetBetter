@@ -12,6 +12,7 @@ export interface ApiErrorBody {
     code: ErrorCode;
     message: string;
     details?: { path: string; message: string }[];
+    stack?: string;
   };
 }
 

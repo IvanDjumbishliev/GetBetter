@@ -3,7 +3,7 @@ import type { ApiErrorBody } from '@shared/types';
 
 export class AppError extends Error {
   constructor(
-    public readonly status: number,
+    public readonly statusCode: number,
     public readonly code: ErrorCode,
     message: string,
     public readonly details?: ApiErrorBody['error']['details'],

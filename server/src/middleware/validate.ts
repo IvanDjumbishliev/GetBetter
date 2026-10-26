@@ -1,7 +1,9 @@
 import { ERROR_CODES } from '@shared/constants';
 import type { RequestHandler } from 'express';
-import type { z, ZodType } from 'zod';
+import { z, type ZodType } from 'zod';
 import { AppError } from '../lib/errors';
+
+export const emptyBodySchema = z.object({}).strict();
 
 /** Parses `input` with `schema`, throwing a VALIDATION_ERROR AppError on failure. */
 export function parseOrThrow<T extends ZodType>(schema: T, input: unknown): z.output<T> {

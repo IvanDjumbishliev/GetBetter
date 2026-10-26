@@ -2,6 +2,8 @@ import { API_PREFIX } from '@shared/constants';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { authRouter } from './modules/auth/authRouter';
@@ -13,7 +15,17 @@ import { healthRouter } from './routes/health';
 
 export const app = express();
 
-app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+app.use(helmet());
+app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: () => env.NODE_ENV === 'test',
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 

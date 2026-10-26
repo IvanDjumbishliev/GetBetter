@@ -1,21 +1,51 @@
-import { useEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { AppShell } from '@/components/AppShell';
 import { ToastContainer } from '@/components/ToastContainer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { FullPageLoader } from '@/components/FullPageLoader';
 import { GuestRoute } from '@/features/auth/GuestRoute';
 import { HomeRoute } from '@/features/auth/HomeRoute';
-import { LoginPage } from '@/features/auth/LoginPage';
 import { ProfilePage } from '@/features/auth/ProfilePage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
-import { RegisterPage } from '@/features/auth/RegisterPage';
 import { useAuth } from '@/features/auth/useAuth';
-import { CommunityPage } from '@/features/community/CommunityPage';
-import { PostDetailPage } from '@/features/community/PostDetailPage';
-import { DashboardPage } from '@/features/dashboard/DashboardPage';
-import { LessonPage } from '@/features/lessons/LessonPage';
-import { TopicDetailPage } from '@/features/lessons/TopicDetailPage';
-import { TopicsPage } from '@/features/lessons/TopicsPage';
+
+const LoginPage = lazy(() =>
+  import('@/features/auth/LoginPage').then((module) => ({ default: module.LoginPage })),
+);
+const RegisterPage = lazy(() =>
+  import('@/features/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+);
+const CommunityPage = lazy(() =>
+  import('@/features/community/CommunityPage').then((module) => ({
+    default: module.CommunityPage,
+  })),
+);
+const PostDetailPage = lazy(() =>
+  import('@/features/community/PostDetailPage').then((module) => ({
+    default: module.PostDetailPage,
+  })),
+);
+const DashboardPage = lazy(() =>
+  import('@/features/dashboard/DashboardPage').then((module) => ({
+    default: module.DashboardPage,
+  })),
+);
+const LessonPage = lazy(() =>
+  import('@/features/lessons/LessonPage').then((module) => ({ default: module.LessonPage })),
+);
+const TopicDetailPage = lazy(() =>
+  import('@/features/lessons/TopicDetailPage').then((module) => ({
+    default: module.TopicDetailPage,
+  })),
+);
+const TopicsPage = lazy(() =>
+  import('@/features/lessons/TopicsPage').then((module) => ({ default: module.TopicsPage })),
+);
+const NotFoundPage = lazy(() =>
+  import('@/features/NotFoundPage').then((module) => ({ default: module.NotFoundPage })),
+);
 
 export function App() {
   const initialize = useAuth((s) => s.initialize);
@@ -27,26 +57,22 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomeRoute />} />
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>
-          <Route element={<AppShell />}>
+          <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/explore" element={<TopicsPage />} />
-            <Route path="/topics" element={<Navigate to="/explore" replace />} />
+            <Route path="/topics" element={<TopicsPage />} />
             <Route path="/topics/:slug" element={<TopicDetailPage />} />
             <Route path="/lessons/:id" element={<LessonPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/community/:postId" element={<PostDetailPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-      <ToastContainer />
     </BrowserRouter>
   );
 }

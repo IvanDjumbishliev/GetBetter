@@ -42,3 +42,9 @@ Welcome to **GetBetter**, an intelligent learning ecosystem designed to transfor
 We welcome contributions from lifelong learners and developers alike! If you'd like to improve GetBetter, feel free to fork the repository, make changes, and submit a pull request.
 
 > *Never feel out of the loop again. Start your journey with GetBetter today!*
+
+## Production and testing
+
+The Express API uses Helmet, a `FRONTEND_URL` CORS allowlist, and a per-IP limit of 100 requests per 15 minutes. Set `REDIS_URL` to enable five-minute caching for topic lists and user stats; cache failures are logged and requests continue against PostgreSQL. `docker compose up -d --wait` starts the local PostgreSQL and Redis services.
+
+Run `npm run lint`, `npm run typecheck`, and `npm test` before building. Server integration tests require `TEST_DATABASE_URL` or `DATABASE_URL` to point to a PostgreSQL database ending in `_test`; they apply migrations and clear that database between tests. The GitHub Actions workflow runs these checks and builds the client and server on every pull request.
