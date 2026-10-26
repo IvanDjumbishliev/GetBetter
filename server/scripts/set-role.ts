@@ -2,7 +2,8 @@
  * Promote or demote a user: npm run user:set-role -- <email> <USER|ADMIN>
  * (There is intentionally no API for this.)
  */
-import { PrismaClient, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
+import { prisma } from '../src/lib/prisma';
 
 const [email, role] = process.argv.slice(2);
 if (!email || !role || !(role in Role)) {
@@ -10,7 +11,6 @@ if (!email || !role || !(role in Role)) {
   process.exit(1);
 }
 
-const prisma = new PrismaClient();
 try {
   const user = await prisma.user.update({
     where: { email: email.toLowerCase() },

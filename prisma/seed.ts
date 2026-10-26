@@ -1,6 +1,5 @@
-import { Difficulty, PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Difficulty } from '@prisma/client';
+import { prisma } from '../server/src/lib/prisma';
 
 const LESSONS_PER_TOPIC = 3;
 const FLASHCARDS_PER_LESSON = 2;
