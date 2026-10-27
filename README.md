@@ -50,3 +50,16 @@ The Express API uses Helmet, a `FRONTEND_URL` CORS allowlist, and a per-IP limit
 New users complete a three-step onboarding flow after signing in. Their daily reminder is scheduled in their saved time zone; the API process runs a minute-level scheduler to deliver reminders at each user’s selected local time. In-app notifications include replies, streak reminders/breaks, and lesson/streak milestones.
 
 Run `npm run lint`, `npm run typecheck`, and `npm test` before building. Server integration tests require `TEST_DATABASE_URL` or `DATABASE_URL` to point to a PostgreSQL database ending in `_test`; they apply migrations and clear that database between tests. The GitHub Actions workflow runs these checks and builds the client and server on every pull request.
+
+## Free deployment
+
+The included [Render Blueprint](./render.yaml) deploys the API and built website together, so the app and its sign-in cookies use the same HTTPS origin. It uses [Neon's free PostgreSQL plan](https://neon.com/pricing) for persistent database storage; Redis is optional and is not required for deployment.
+
+1. Push this repository to GitHub.
+2. Create a free PostgreSQL project on Neon. Copy its pooled connection string for the `DATABASE_URL` value.
+3. In Render, create a **Blueprint** from your GitHub repository and select the **Free** plan. When prompted, provide the Neon `DATABASE_URL`. The Blueprint generates separate access-token and refresh-token secrets for you.
+4. Wait for the first deployment to finish. Render provides an HTTPS URL for the app.
+5. To load the sample topics and lessons, run `npm run db:seed` once with `DATABASE_URL` set to the Neon connection string in your local terminal. Keep the connection string private and do not commit it.
+6. Open the Render URL on your phone. On Android Chrome, use the browser menu's **Add to Home screen**; on iPhone Safari, use **Share → Add to Home Screen**.
+
+This setup is intended for a personal project, not a production-critical service. Render's free web service can sleep after inactivity and take about a minute to wake; it also has monthly usage limits. Neon's free database can scale to zero while idle, and its free storage/compute quotas apply. Since the notification scheduler runs inside the web service, scheduled reminders are not dependable while Render has the service asleep. Confirm both providers still offer the stated free quotas before deploying, select only free resources, and avoid enabling paid resources.

@@ -3,7 +3,11 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
-  FRONTEND_URL: z.url().default(process.env.CLIENT_URL || 'http://localhost:5173'),
+  FRONTEND_URL: z
+    .url()
+    .default(
+      process.env.RENDER_EXTERNAL_URL || process.env.CLIENT_URL || 'http://localhost:5173',
+    ),
   REDIS_URL: z.url().optional(),
   DATABASE_URL: z.string().min(1),
   ACCESS_TOKEN_SECRET: z.string().min(32),

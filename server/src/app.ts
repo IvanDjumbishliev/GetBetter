@@ -2,6 +2,8 @@ import { API_PREFIX } from '@shared/constants';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { env } from './config/env';
@@ -39,6 +41,28 @@ app.use(`${API_PREFIX}/me`, meRouter);
 app.use(`${API_PREFIX}/notifications`, notificationRouter);
 app.use(`${API_PREFIX}/posts`, postsRouter);
 app.use(`${API_PREFIX}/comments`, commentsRouter);
+
+if (env.NODE_ENV === 'production') {
+  const clientDistPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+  const clientIndexPath = resolve(clientDistPath, 'index.html');
+
+  app.use(express.static(clientDistPath));
+  app.use((req, res, next) => {
+    if (
+      req.method !== 'GET' ||
+      req.path === API_PREFIX ||
+      req.path.startsWith(`${API_PREFIX}/`) ||
+      !req.accepts('html')
+    ) {
+      next();
+      return;
+    }
+
+    res.sendFile(clientIndexPath, (error) => {
+      if (error) next(error);
+    });
+  });
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);
