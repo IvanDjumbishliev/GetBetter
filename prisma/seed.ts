@@ -1,9 +1,6 @@
 import { Difficulty } from '@prisma/client';
 import { prisma } from '../server/src/lib/prisma';
-
-const LESSONS_PER_TOPIC = 3;
-const FLASHCARDS_PER_LESSON = 2;
-const QUESTIONS_PER_LESSON = 3;
+import { seedContent } from './seed-content';
 
 interface TopicSeed {
   title: string;
@@ -88,37 +85,16 @@ function slugify(value: string): string {
     .replace(/^-|-$/g, '');
 }
 
-function placeholderContent(topic: string, order: number): string {
-  return [
-    `# ${topic}: Part ${order}`,
-    '',
-    `This is placeholder content for part ${order} of "${topic}".`,
-    '',
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    '',
-    '## Key ideas',
-    '',
-    '- Placeholder key idea one',
-    '- Placeholder key idea two',
-    '- Placeholder key idea three',
-  ].join('\n');
-}
-
-function placeholderQuestion(topic: string, order: number, n: number) {
-  const options = ['a', 'b', 'c', 'd'].map((id) => ({
-    id,
-    text: `Placeholder option ${id.toUpperCase()}`,
-  }));
-  return {
-    question: `Placeholder question ${n} about ${topic} (part ${order})?`,
-    options,
-    correctOptionId: options[(n - 1) % options.length]!.id,
-    explanation: `Placeholder explanation for question ${n}.`,
-  };
-}
-
 async function main() {
-  if (process.env.SEED_IF_EMPTY === 'true' && (await prisma.topic.count()) > 0) {
+  const existingTopicCount = await prisma.topic.count();
+  const placeholderLessonCount = await prisma.lesson.count({
+    where: { content: { contains: 'This is placeholder content for part' } },
+  });
+  if (
+    process.env.SEED_IF_EMPTY === 'true' &&
+    existingTopicCount > 0 &&
+    placeholderLessonCount === 0
+  ) {
     console.log('Seed skipped: topics already exist.');
     return;
   }
@@ -137,9 +113,11 @@ async function main() {
 
     for (const topicSeed of categorySeed.topics) {
       const topicSlug = slugify(topicSeed.title);
+      const contentSeed = seedContent[topicSlug];
+      if (!contentSeed) throw new Error(`Missing lesson content for topic "${topicSeed.title}".`);
       const topicData = {
         title: topicSeed.title,
-        description: `A placeholder introduction to ${topicSeed.title}.`,
+        description: contentSeed.description,
         difficulty: topicSeed.difficulty,
         estimatedMinutes: topicSeed.estimatedMinutes,
         categoryId: category.id,
@@ -150,11 +128,12 @@ async function main() {
         create: { ...topicData, slug: topicSlug },
       });
 
-      for (let order = 1; order <= LESSONS_PER_TOPIC; order++) {
+      for (const [index, lessonSeed] of contentSeed.lessons.entries()) {
+        const order = index + 1;
         const lessonData = {
-          title: `${topicSeed.title}: Part ${order}`,
-          content: placeholderContent(topicSeed.title, order),
-          summary: `Placeholder summary for part ${order} of ${topicSeed.title}.`,
+          title: lessonSeed.title,
+          content: lessonSeed.content,
+          summary: lessonSeed.summary,
         };
         const lesson = await prisma.lesson.upsert({
           where: { topicId_order: { topicId: topic.id, order } },
@@ -167,17 +146,32 @@ async function main() {
           prisma.flashcard.deleteMany({ where: { lessonId: lesson.id } }),
           prisma.quizQuestion.deleteMany({ where: { lessonId: lesson.id } }),
           prisma.flashcard.createMany({
-            data: Array.from({ length: FLASHCARDS_PER_LESSON }, (_, i) => ({
+            data: lessonSeed.flashcards.map(([front, back]) => ({
               lessonId: lesson.id,
-              front: `Placeholder term ${i + 1} from ${lessonData.title}`,
-              back: `Placeholder definition ${i + 1}.`,
+              front,
+              back,
             })),
           }),
           prisma.quizQuestion.createMany({
-            data: Array.from({ length: QUESTIONS_PER_LESSON }, (_, i) => ({
-              lessonId: lesson.id,
-              ...placeholderQuestion(topicSeed.title, order, i + 1),
-            })),
+            data: lessonSeed.questions.map(
+              ([question, choices, correctIndex, explanation], questionIndex) => {
+                const offset = (order + questionIndex) % choices.length;
+                const orderedChoices = [...choices.slice(offset), ...choices.slice(0, offset)];
+                const orderedCorrectIndex =
+                  (correctIndex - offset + choices.length) % choices.length;
+
+                return {
+                  lessonId: lesson.id,
+                  question,
+                  options: orderedChoices.map((text, optionIndex) => ({
+                    id: String.fromCharCode(97 + optionIndex),
+                    text,
+                  })),
+                  correctOptionId: String.fromCharCode(97 + orderedCorrectIndex),
+                  explanation,
+                };
+              },
+            ),
           }),
         ]);
       }
