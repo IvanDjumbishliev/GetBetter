@@ -10,6 +10,7 @@ import { DailyLessonCard } from '@/features/lessons/DailyLessonCard';
 import { todayKey } from '@/lib/time-zone';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import { CategoryProgress } from './CategoryProgress';
+import { FunFactCard } from './FunFactCard';
 import { useStatsQuery } from './dashboardApi';
 import { heatmapDays } from './dates';
 import { StatsGrid } from './StatsGrid';
@@ -51,6 +52,8 @@ export function DashboardPage() {
           <DailyLessonCard />
         </div>
       </div>
+
+      <FunFactCard />
 
       <div id="progress">
         {stats ? (
