@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { StreakBadge } from '@/components/StreakBadge';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useLogoutMutation } from '@/features/auth/authApi';
 import { useAuth } from '@/features/auth/useAuth';
@@ -85,6 +86,7 @@ export function Navbar({ sidebarOpen, onToggleSidebar }: NavbarProps) {
         {stats.data && (
           <StreakBadge streak={stats.data.currentStreak} className="hidden sm:inline-flex" />
         )}
+        <ThemeToggle />
         <NotificationBell />
 
         <div className="relative ml-0 sm:ml-1" ref={wrapRef}>

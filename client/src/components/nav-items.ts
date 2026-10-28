@@ -1,4 +1,4 @@
-import { BookOpen, Compass, Home, LineChart, MessagesSquare, type LucideIcon } from 'lucide-react';
+import { BookOpen, Compass, Home, LineChart, MessagesSquare, Newspaper, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   label: string;
@@ -16,16 +16,17 @@ export const APP_NAV: NavItem[] = [
   },
   {
     label: 'Explore',
-    to: '/explore',
+    to: '/topics',
     icon: Compass,
-    isActive: (pathname, search) => pathname === '/explore' && !search.includes('enrolled=1'),
+    isActive: (pathname, search) => pathname === '/topics' && !search.includes('enrolled=1'),
   },
   {
     label: 'My Learning',
-    to: '/explore?enrolled=1',
+    to: '/topics?enrolled=1',
     icon: BookOpen,
-    isActive: (pathname, search) => pathname === '/explore' && search.includes('enrolled=1'),
+    isActive: (pathname, search) => pathname === '/topics' && search.includes('enrolled=1'),
   },
+  { label: 'News', to: '/news', icon: Newspaper },
   { label: 'Community', to: '/community', icon: MessagesSquare },
   {
     label: 'Progress',

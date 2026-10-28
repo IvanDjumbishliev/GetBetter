@@ -28,14 +28,13 @@ export function ProfilePage() {
       <section id="settings" className="space-y-3 border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Settings</h2>
         <p className="text-sm text-muted-foreground">
-          Appearance is locked to the GetBetter dark system — high contrast, electric accent, no
-          warm palettes.
+          Switch between light and dark mode to match your reading comfort and focus.
         </p>
         <dl className="grid gap-2 text-sm sm:grid-cols-[8rem_1fr]">
           <dt className="text-muted-foreground">Role</dt>
           <dd className="font-medium">{user.role === 'ADMIN' ? 'Admin' : 'Member'}</dd>
           <dt className="text-muted-foreground">Theme</dt>
-          <dd className="font-medium">Night / indigo</dd>
+          <dd className="font-medium">System-aware / saved preference</dd>
         </dl>
       </section>
 

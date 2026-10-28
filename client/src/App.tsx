@@ -46,6 +46,9 @@ const TopicDetailPage = lazy(() =>
 const TopicsPage = lazy(() =>
   import('@/features/lessons/TopicsPage').then((module) => ({ default: module.TopicsPage })),
 );
+const NewsPage = lazy(() =>
+  import('@/features/news/NewsPage').then((module) => ({ default: module.NewsPage })),
+);
 const NotFoundPage = lazy(() =>
   import('@/features/NotFoundPage').then((module) => ({ default: module.NotFoundPage })),
 );
@@ -74,6 +77,7 @@ export function App() {
                   <Route path="/topics" element={<TopicsPage />} />
                   <Route path="/topics/:slug" element={<TopicDetailPage />} />
                   <Route path="/lessons/:id" element={<LessonPage />} />
+                  <Route path="/news" element={<NewsPage />} />
                   <Route path="/community" element={<CommunityPage />} />
                   <Route path="/community/:postId" element={<PostDetailPage />} />
                   <Route path="/profile" element={<ProfilePage />} />

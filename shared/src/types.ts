@@ -175,6 +175,19 @@ export interface DailyLessonResponse {
   dailyLesson: DailyLesson | null;
 }
 
+export interface NewsArticle {
+  id: string;
+  title: string;
+  summary: string;
+  link: string;
+  source: string;
+  publishedAt: string;
+}
+
+export interface NewsResponse {
+  news: NewsArticle[];
+}
+
 export interface QuizAnswer {
   questionId: string;
   selectedOptionId: string;

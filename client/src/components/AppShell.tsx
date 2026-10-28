@@ -1,15 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
 
 import { CommandPalette } from '@/components/CommandPalette';
 import { Navbar } from '@/components/Navbar';
 import { Sidebar } from '@/components/Sidebar';
 import { useTopicsQuery } from '@/features/lessons/lessonsApi';
+import { useThemeStore } from '@/stores/theme';
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const theme = useThemeStore((state) => state.theme);
   // Warm the command palette cache while the shell is mounted.
   useTopicsQuery();
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
 
   return (
     <div className="min-h-screen bg-background">
