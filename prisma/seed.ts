@@ -118,6 +118,11 @@ function placeholderQuestion(topic: string, order: number, n: number) {
 }
 
 async function main() {
+  if (process.env.SEED_IF_EMPTY === 'true' && (await prisma.topic.count()) > 0) {
+    console.log('Seed skipped: topics already exist.');
+    return;
+  }
+
   for (const categorySeed of categories) {
     const categorySlug = slugify(categorySeed.name);
     const category = await prisma.category.upsert({

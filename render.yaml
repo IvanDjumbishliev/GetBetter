@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm ci --include=dev && npm run build
-    startCommand: npx prisma migrate deploy && npm run start -w server
+    startCommand: npx prisma migrate deploy && SEED_IF_EMPTY=true npx prisma db seed && npm run start -w server
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
